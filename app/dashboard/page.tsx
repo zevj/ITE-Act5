@@ -8,10 +8,30 @@ export default function DashboardPage() {
   const [showModal, setShowModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // TODO: Replace with real auth
+  // ✨ Step 8: include "name" here
+  const [user, setUser] = useState<{ email: string; name: string } | null>(null);
+
+  // REAL AUTH CHECK
   useEffect(() => {
-    const isLoggedIn = true;
-    if (!isLoggedIn) router.push("/login");
+    async function fetchUser() {
+      try {
+        const res = await fetch("/api/auth/me", { method: "GET" });
+
+        if (!res.ok) {
+          router.push("/login");
+          return;
+        }
+
+        const data = await res.json();
+
+        // ✨ Step 8: store user data including name
+        setUser(data.user);
+      } catch (e) {
+        router.push("/login");
+      }
+    }
+
+    fetchUser();
   }, [router]);
 
   const handleLogout = async () => {
@@ -19,7 +39,6 @@ export default function DashboardPage() {
 
     try {
       const res = await fetch("/api/auth/logout", { method: "POST" });
-
       if (res.ok) router.push("/login");
     } catch (e) {
       console.error("Logout error:", e);
@@ -30,10 +49,20 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 p-8 relative">
-
-      {/* HEADER + LOGOUT BUTTON */}
+      
+      {/* HEADER */}
       <div className="flex justify-between items-center">
-        <h1 className="text-4xl font-bold text-green-600 mb-6">Dashboard</h1>
+        <div>
+          <h1 className="text-4xl font-bold text-green-600 mb-1">Dashboard</h1>
+
+          {/* ✨ Step 8: Show name instead of email */}
+          <p className="text-gray-600">
+            Welcome,{" "}
+            <span className="font-semibold text-green-700">
+              {user?.name || user?.email}
+            </span>
+          </p>
+        </div>
 
         <button
           onClick={() => setShowModal(true)}
@@ -43,9 +72,11 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      <p className="text-gray-700">Welcome back! Here’s your nutrition summary.</p>
+      <p className="text-gray-700 mt-6">
+        Here’s your nutrition summary.
+      </p>
 
-      {/* DASHBOARD CARDS */}
+      {/* CARDS */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl shadow p-6">
           <h2 className="text-lg font-semibold text-gray-800">Calories Today</h2>
@@ -65,14 +96,8 @@ export default function DashboardPage() {
 
       {/* LOGOUT MODAL */}
       {showModal && (
-        <div
-          className="fixed inset-0 flex items-center justify-center
-                     bg-black/40 backdrop-blur-sm z-50 animate-fadeIn"
-        >
-          <div
-            className="bg-white rounded-xl shadow-xl p-6 w-80 text-center
-                       animate-scaleIn"
-          >
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50 animate-fadeIn">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-80 text-center animate-scaleIn">
             <h2 className="text-xl font-semibold text-gray-800">Confirm Logout</h2>
             <p className="text-gray-600 mt-2">Are you sure you want to logout?</p>
 
@@ -95,6 +120,24 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* ANIMATIONS */}
+      <style jsx>{`
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out forwards;
+        }
+        .animate-scaleIn {
+          animation: scaleIn 0.25s ease-out forwards;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+          from { transform: scale(0.9); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+      `}</style>
 
     </main>
   );

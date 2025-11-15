@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthRequest } from "@/hooks/useAuthRequest";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -31,9 +32,11 @@ export default function LoginPage() {
         onSubmit={handleLogin}
         className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md"
       >
-        <h2 className="text-3xl font-bold text-center text-green-600 mb-6">
-          Login to NutriTrack
-        </h2>
+        <h1 className="text-3xl font-bold text-green-600 mb-6 text-center">
+  <Link href="/" className="hover:underline">
+    NutriTrack
+  </Link>
+</h1>
 
         <label className="block mb-2 text-sm font-semibold text-gray-700">
           Email
